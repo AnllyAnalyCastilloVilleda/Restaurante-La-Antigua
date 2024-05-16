@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    </head>
+
+	<body>
+        {% load static %}
+        {% include 'nav.html' %}
+        <div id="app">
+            <a href=""> 
+                <i class='bx bxs-cart' style="font-size: 50px;"></i>
+            </a>
+            
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="btnradio1" @click="ObtenerArticulos('')">Todo</label>
+              
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio2" @click="ObtenerArticulos('1')">Comida</label>
+              
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio3" @click="ObtenerArticulos('2')">Bebida</label>
+    
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
+                <label class="btn btn-outline-primary" for="btnradio4" @click="ObtenerArticulos('3')">Postre</label>
+            </div>
+            <div class="row m-3 " >
+                <div class="col-md-6 col-lg-3 mb-3 " v-for="articulo in lista_articulos" >
+                    <div class="card" style="width: 18rem;">
+                        <img :src="'/static/imagenes/'+ articulo.nombre +'.jpg'" class="card-img-top" :alt="articulo.nombre+'.jpg'" style="height: 200px; object-fit: cover;">
+                        <div class="card-body" style="width: 286px; height: 230px;" >
+                            <h5 class="card-title">[[ articulo.nombre ]]</h5>
+                            <p class="card-text">[[articulo.descripcion]]</p>
+                            <p class="card-text"> Precio: Q[[articulo.precio]]</p>
+                            <button @click='CargarArticulo(articulo)' type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Añadir al Carrito</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Boton Añadir al Carrito -->
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Añadir al Carrito</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label> Nombre: [[articulo.nombre]]</label><br/>
+                            <label> Precio:  Q[[articulo.precio]]</label>
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Cantidad</span>
+                                <input min='1' type="number" class="form-control" v-model='articulo.cantidad' aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                            </div><br/>
+                            <label> Total: Q[[articulo.precio * articulo.cantidad]]</label>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button @click="añadiralCarrito(articulo)" type="button" class="btn btn-primary">Añadir</button>
+                            </div>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+        <script>
+            new Vue({
+                el: "#app",
+                delimiters:["[[","]]"],
+                data() {
+                    return{ 
+                        lista_articulos:[],
+                        articulo: {
+                            id: '',
+                            nombre: '',
+                            descripcion: '',
+                            precio: ''
+                        }
+
+                    }
+                },
+                methods:{
+                    async ObtenerArticulos(tipo){
+                        const response = await fetch("../API/articulos/?tipo=" + tipo);
+                        this.lista_articulos = await response.json();
+                    },
+                    async buscarArticulos() {
+                        const response = await fetch(`../API/articulos/?search=${this.terminoBusqueda}`);
+                        this.lista_articulos = await response.json();
+                    },
+                    async CargarArticulo(objeto){
+                        this.articulo= {
+                            id: objeto.id,
+                            nombre: objeto.nombre,
+                            descripcion: objeto.descripcion,
+                            precio: objeto.precio,
+                            cantidad: 1
+                            
+                        }                           
+                    },
+                    async añadiralCarrito(articulo){
+                        
+                    }
+                },
+                created(){
+                    this.ObtenerArticulos('');
+                }
+
+             })
+        </script>
+	</body>
+</html> 
