@@ -5,49 +5,57 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>La Antigua</title>
-  <!-- Agrega la siguiente línea para el ícono de la pestaña -->
-  <link rel="icon" href="static/imagenes/logo.png" type="image/png">
-
-
-  
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <link rel="icon" type="image/x-icon" href="{% static 'imagenes/Logo.ico' %}">
+  <style>
+    /* Estilos para el logo */
+    .navbar-brand img {
+      height: 40px; 
+      width: auto; 
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarScroll">
-          <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/inicio/">Inicio</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/menu/">Menu</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Pedidos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Inventario</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Cuentas por Pagar</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Cuentas por Cobrar</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Recursos Humanos y Planilla</a>
-            </li>
-            <li class="nav-item">
-              <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Almuerzos al Credito</a>
-              </li>
-              <li class="nav-item">
-                <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#">Reporteria</a>
-                </li>
-          </ul>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Buscar">
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
-          </form>
-        </div>
+      <!-- Logo de la empresa -->
+      <a class="navbar-brand" href="#">
+        <img src="{% static 'imagenes/logoinicio.png' %}" alt="Logo de La Antigua">
+      </a>
+      <div class="collapse navbar-collapse" id="navbarScroll">
+        <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/inicio/">Inicio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/menu/">Menu</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Pedidos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Inventario</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Cuentas por Pagar</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Cuentas por Cobrar</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Recursos Humanos y Planilla</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Almuerzos al Credito</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Reporteria</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <button class="btn btn-outline-danger" type="button" onclick="window.close()">Salir</button>
+        </form>
       </div>
+    </div>
   </nav>
+</body>
+</html>
