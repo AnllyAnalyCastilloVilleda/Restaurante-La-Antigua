@@ -8,13 +8,7 @@ from .models import *
 from .serializers import *
 
 #Los Viwsets son los objetos de un modelo que quiero mostrar en la API 
-class ArticuloViewsets(viewsets.ModelViewSet):
-    serializer_class = ArticuloSerializer
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Articulo.objects.all()
-    
 class ArticuloViewsets(viewsets.ModelViewSet):
     serializer_class = ArticuloSerializer
     permission_classes = [IsAuthenticated]
@@ -26,4 +20,17 @@ class ArticuloViewsets(viewsets.ModelViewSet):
         else:
             return Articulo.objects.all()
 
+class CarritoViewSets(viewsets.ModelViewSet):
+    serializer_class = CarritoSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        return Carrito.objects.filter(estadopedido="sinAceptar")
+
+class ItemCarritoViewSets(viewsets.ModelViewSet):
+    serializer_class = ItemCarritoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        idCarrito = self.request.query_params.get('carrito')
+        return ItemCarrito.objects.filter(carrito=idCarrito)
