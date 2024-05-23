@@ -8,7 +8,7 @@ class ArticuloAdmin(admin.ModelAdmin):
 admin.site.register(Articulo, ArticuloAdmin)
 
 class CarritoAdmin(admin.ModelAdmin):
-    list_display = ("id",  "mesa", "pagado", "estadopedido")
+    list_display = ("id",  "mesa", "estadopedido")
 
 admin.site.register(Carrito, CarritoAdmin)
 

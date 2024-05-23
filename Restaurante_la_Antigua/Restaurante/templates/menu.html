@@ -78,14 +78,14 @@
                                 <div class="row mb-3">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="basic-addon1">Mesa:</span>
-                                        <input type="number" v-model="mesa" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                                        <input type="number" v-model="carrito.mesa" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <button @click="crearNuevoCarrito()" class="btn btn-primary">Crear Nuevo Carrito</button>
                                 </div>
                                 <div class="row mb-3">
-                                    <select class="form-select" @change="obtenerItemsCarrito()" v-model="articulo.idCarrito" aria-label="Default select example">
+                                    <select class="form-select" @change="obtenerItemsCarrito()" v-model="carrito.id" aria-label="Default select example">
                                         <option v-for="carrito in lista_carritos_nuevos" :value="carrito.id">[[carrito.mesa]]</option>
                                     </select>
                                 </div>
@@ -128,16 +128,19 @@
                             nombre: '',
                             descripcion: '',
                             precio: '',
-                            idCarrito: 0
                         },
-                        mesa: 0,
+                        carrito: {
+                            id: '',
+                            mesa: '',
+                            pagado: false
+                        },
                     }
                 },
                 methods:{
                     async crearNuevoCarrito(){
                         const formData = new FormData()
-                        formData.append("mesa", this.mesa)
-                        await fetch("../API/carritos_nuevos/", {
+                        formData.append("mesa", this.carrito.mesa)
+                        await fetch("../API/carritos/", {
                             method: "POST",
                             headers: {
                                 "X-CSRFToken": Cookies.get("csrftoken")
@@ -150,11 +153,11 @@
                         this.lista_articulos = await response.json();
                     },
                     async obtenerCarritosNuevos(){
-                        const response = await fetch("../API/carritos_nuevos/");
+                        const response = await fetch("../API/carritos/?estado=sinAceptar");
                         this.lista_carritos_nuevos = await response.json();
                     },
                     async obtenerItemsCarrito(){
-                        const response = await fetch("../API/items_carrito/?carrito=" + this.articulo.idCarrito);
+                        const response = await fetch("../API/items_carrito/?carrito=" + this.carrito.id);
                         this.lista_articulos_carrito = await response.json();
                     },
                     async buscarArticulos() {
@@ -168,16 +171,15 @@
                             descripcion: objeto.descripcion,
                             precio: objeto.precio,
                             cantidad: 1,
-                            idCarrito: this.articulo.idCarrito
-                        }                           
+                        }                    
                     },
                     async añadirAlCarrito(){
                         const formData = new FormData()
                         formData.append("cantidad", parseInt(this.articulo.cantidad, 10))
-                        formData.append("carrito", this.articulo.idCarrito)
+                        formData.append("carrito", this.carrito.id)
                         formData.append("idArticulo", this.articulo.id)
 
-                        await fetch("../API/items_carrito/?carrito=" + this.articulo.idCarrito, {
+                        await fetch("../API/items_carrito/?carrito=" + this.carrito.id, {
                             method: "POST",
                             headers: {
                                 "X-CSRFToken": Cookies.get("csrftoken")
@@ -189,11 +191,9 @@
                     },
                     async enviarCarritoACocina(){
                         const formData = new FormData()
-                        formData.append("mesa", this.mesa)
-                        formData.append("pagado", false)
                         formData.append("estadopedido", "En espera")
 
-                        await fetch("../API/carritos_nuevos/" + this.articulo.idCarrito + "/", {
+                        await fetch("../API/carrito-cambiar-estado/" + this.carrito.id + "/", {
                             method: "PUT",
                             headers: {
                                 "X-CSRFToken": Cookies.get("csrftoken")
@@ -204,7 +204,7 @@
                     this.lista_articulos_carrito = []
                     },
                     async eliminarItemCarrito(idItemCarrito){
-                        await fetch("../API/items_carrito/" + idItemCarrito + "/?carrito=" + this.articulo.idCarrito, {
+                        await fetch("../API/items_carrito/" + idItemCarrito + "/?carrito=" + this.carrito.id, {
                             method: "DELETE",
                             headers: {
                                 "X-CSRFToken": Cookies.get("csrftoken")

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    </head>
+    <body>
+        {% load static %}
+        {% include 'nav.html' %}
+        <div id="app">
+            <div class="btn-group mb-3" role="group" aria-label="Basic radio toggle button group">
+                <input id="En%20esperaRadio" type="radio" class="btn-check" name="btnradio" autocomplete="off" checked>
+                <label class="btn btn-outline-primary" for="En%20esperaRadio" @click="obtenerCarritos('En%20espera')">En Espera</label>
+
+                <input id="AceptadoRadio" type="radio" class="btn-check" name="btnradio" autocomplete="off">
+                <label class="btn btn-outline-primary" for="AceptadoRadio" @click="obtenerCarritos('Aceptado')">Aceptado</label>
+
+                <input id="TerminadoRadio" type="radio" class="btn-check" name="btnradio" autocomplete="off">
+                <label class="btn btn-outline-primary" for="TerminadoRadio" @click="obtenerCarritos('Terminado')">Terminado</label>
+    
+                <input id="EntregadoRadio" type="radio" class="btn-check" name="btnradio" autocomplete="off">
+                <label class="btn btn-outline-primary" for="EntregadoRadio" @click="obtenerCarritos('Entregado')">Entregado</label>
+            </div>
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-6 border border-primary rounded p-5">
+                    <div class="row border border-primary rounded mb-3" v-for="carrito in lista_carritos">
+                        <div class="col">
+                            <h1>Mesa #[[ carrito.mesa ]]</h1>
+                        </div>
+                        <div class="col d-flex align-content-center p-1">
+                            <button class="btn btn-primary" @click="obtenerItemsCarrito(carrito.id)" data-bs-toggle="modal" data-bs-target="#modalCarrito">Artículos</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modals">
+                <!-- Modal Artículos -->
+                <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="exampleModalLabel">Carrito</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3" v-for="item in lista_articulos_carrito">
+                                    <div class="card">
+                                        <h4 class="card-header">[[ item.articulo.nombre ]]</h4>
+                                        <div class="card-body">
+                                            <h5 class="card-title"><strong>Precio: </strong> Q[[ item.articulo.precio ]]</h5>
+                                            <h5><strong>Cantidad: </strong> [[ item.cantidad ]]</h5>
+                                            <h5><strong>Total: </strong> Q[[ item.articulo.precio * item.cantidad ]]</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="cerrarModalArticulos" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" @click="carritoCambiarEstado()" class="btn btn-primary">[[ siguienteSeguimiento ]]</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+        <script>
+            new Vue({
+                el: "#app",
+                delimiters:["[[","]]"],
+                data() {
+                    return{
+                        lista_carritos: [],
+                        lista_articulos_carrito: [],
+                        articulo: {
+                            id: '',
+                            cantidad: 1,
+                            nombre: '',
+                            descripcion: '',
+                            precio: '',
+                        },
+                        estado: '',
+                        mesa: 0,
+                        siguienteSeguimiento: '',
+                        idCarrito: 0,
+                    }
+                },
+                methods:{
+                    async obtenerItemsCarrito(id){
+                        const response = await fetch("../API/items_carrito/?carrito=" + id);
+                        this.lista_articulos_carrito = await response.json();
+                        this.idCarrito = id
+                    },
+                    async obtenerCarritos(estado){
+                        const response = await fetch("../API/carritos/?estado=" + estado);
+                        this.lista_carritos = await response.json();
+
+                        this.estado = estado
+
+                        switch(estado)
+                        {
+                            case "En%20espera":
+                                this.siguienteSeguimiento = "Aceptado"
+                                break;
+
+                            case "Aceptado":
+                                this.siguienteSeguimiento = "Terminado"
+                                break;
+
+                            case "Terminado":
+                                this.siguienteSeguimiento = "Entregado"
+                                break;
+
+                            case "Entregado":
+                                this.siguienteSeguimiento = "Pagado"
+                                break;
+
+                        }
+                    },
+                    async CargarArticulo(objeto){
+                        this.articulo= {
+                            id: objeto.id,
+                            nombre: objeto.nombre,
+                            descripcion: objeto.descripcion,
+                            precio: objeto.precio,
+                            cantidad: 1,
+                            idCarrito: this.articulo.idCarrito
+                        }                           
+                    },
+                    async carritoCambiarEstado(){
+                        const formData = new FormData();
+                        formData.append("estadopedido", this.siguienteSeguimiento)
+
+                        await fetch("../API/carrito-cambiar-estado/" + this.idCarrito + "/", {
+                            method: "PUT",
+                            headers: {
+                                "X-CSRFToken": Cookies.get("csrftoken")
+                            }, body: formData
+                        })
+
+                        this.obtenerCarritos(this.estado)
+                        
+                        document.getElementById("cerrarModalArticulos").click();
+                    },
+                },
+                created(){
+                    this.obtenerCarritos("En%20espera");
+                }
+            })
+        </script>
+    </body>
+</html>

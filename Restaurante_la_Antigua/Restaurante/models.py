@@ -30,12 +30,12 @@ class Carrito(models.Model):
         ('Aceptado',  'Aceptado'),
         ('Terminado', 'Terminado'),
         ('Entregado', 'Entregado'),
+        ('Pagado', 'Pagado'),
     ]
 
     id = models.AutoField(primary_key=True, unique=True)
     usuario = models.ForeignKey(User, default=1, on_delete= models.CASCADE)
     mesa = models.IntegerField()
-    pagado = models.BooleanField(default=False)
     estadopedido = models.CharField(default='sinAceptar', max_length=10, choices=ESTADO_CHOICES)
 
     def __str__(self):

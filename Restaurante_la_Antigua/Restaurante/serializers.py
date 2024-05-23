@@ -19,6 +19,12 @@ class CarritoSerializer(serializers.ModelSerializer):
         )
         return objeto
     
+class CarritoCambiarEstadoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Carrito
+        fields = "__all__"
+        read_only_fields = ("id", "usuario", "mesa")
+
 class ItemCarritoSerializer(serializers.ModelSerializer):
 
     articulo = ArticuloSerializer(read_only=True)

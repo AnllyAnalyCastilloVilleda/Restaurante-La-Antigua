@@ -25,7 +25,19 @@ class CarritoViewSets(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Carrito.objects.filter(estadopedido="sinAceptar")
+        estado = self.request.query_params.get('estado', None)
+
+        if estado:
+            return Carrito.objects.filter(estadopedido=estado)
+        else:
+            return Carrito.objects.all()
+        
+class CarritoCambiarEstadoViewSets(viewsets.ModelViewSet):
+    serializer_class = CarritoCambiarEstadoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Carrito.objects.all()
 
 class ItemCarritoViewSets(viewsets.ModelViewSet):
     serializer_class = ItemCarritoSerializer
