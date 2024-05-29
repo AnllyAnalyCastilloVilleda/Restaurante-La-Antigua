@@ -10,23 +10,31 @@
 </head>
 <body>
     <form class="row g-3 d-flex justify-content-center align-content-center" action="" method="POST">
-        <div class="col-8">
+        <div class="col-lg-5 col-md-11">
             {% csrf_token %}
             <div class="row d-flex justify-content-center">
                 <div class="col-4">
-                    <img src="/static/imagenes/Logo.png" alt="Logo">
+                    <img translate="-50% -50%" height="180" src="/static/imagenes/Logo.png" alt="Logo">
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="inputEmailAddress" class="form-label">Usuario</label>
-                <div class="input-group" id="username">
-                    <input type="text" name="username" autofocus class="form-control" id="inputUsername" placeholder="Nombre de Usuario">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="inputChoosePassword" class="form-label">Contraseña</label>
-                <div class="input-group" id="show_hide_password">
-                    <input type="password" name="password" class="form-control border-end-0" id="inputChoosePassword" value="" placeholder="Ingrese la Contraseña"> <a href="javascript:;" class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                <div class="col">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" name="username" autofocus class="form-control" id="inputEmailAddress" placeholder="Nombre de Usuario">
+                                <label for="floatingInput">Usuario</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <input type="password" name="password" class="form-control border-end-0" id="inputChoosePassword" value="" placeholder="Ingrese la Contraseña"> <a href="javascript:;" class="input-group-text bg-transparent"><i class='bx bx-hide'></i></a>
+                                <label for="floatingPassword">Contraseña</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row mb-3">
