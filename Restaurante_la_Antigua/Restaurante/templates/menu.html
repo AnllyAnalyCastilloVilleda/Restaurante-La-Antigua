@@ -1,224 +1,245 @@
-
 <!DOCTYPE html>
 <html>
+<head>
+    <link rel="shrotcut icon" href="/static/imagenes/Logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
 
-	<head>
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    </head>
-
-	<body>
-        {% load static %}
-        {% include 'nav.html' %}
-        <div id="app">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCarrito"> 
-                <i class='bx bxs-cart' style="font-size: 50px;"></i>
-            </button>
-            
+<body>
+    {% load static %}
+    {% include 'nav.html' %}
+    <div id="app">
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalCarrito"> 
+                    <i class='bx bxs-cart' style="font-size: 30px;"></i>
+                </button>
+            </div>
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
                 <label class="btn btn-outline-primary" for="btnradio1" @click="ObtenerArticulos('')">Todo</label>
-
+        
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btnradio2" @click="ObtenerArticulos('1')">Comida</label>
-
+        
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btnradio3" @click="ObtenerArticulos('2')">Bebida</label>
-    
+        
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
                 <label class="btn btn-outline-primary" for="btnradio4" @click="ObtenerArticulos('3')">Postre</label>
             </div>
-            <div class="row m-3 " >
-                <div class="col-md-6 col-lg-3 mb-3 " v-for="articulo in lista_articulos" >
-                    <div class="card" style="width: 18rem;">
-                        <img :src="'/static/imagenes/'+ articulo.nombre +'.jpg'" class="card-img-top" :alt="articulo.nombre+'.jpg'" style="height: 200px; object-fit: cover;">
-                        <div class="card-body" style="width: 286px; height: 230px;" >
-                            <h5 class="card-title">[[ articulo.nombre ]]</h5>
-                            <p class="card-text">[[articulo.descripcion]]</p>
-                            <p class="card-text"> Precio: Q[[articulo.precio]]</p>
-                            <button @click='CargarArticulo(articulo)' type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAñadirArticulo">Añadir al Carrito</button>
-                        </div>
+        
+            <div class="input-group" style="width: 300px;">
+                <input type="text" class="form-control" placeholder="Buscar por nombre" v-model="terminoBusqueda" aria-label="Buscar por nombre" aria-describedby="boton-buscar">
+                <button class="btn btn-outline-secondary" type="button" id="boton-buscar" @click="buscarArticulos">Buscar</button>
+            </div>
+        </div>
+        <div class="row m-3">
+            <div class="col-md-6 col-lg-3 mb-3" v-for="articulo in lista_articulos">
+                <div class="card" style="width: 18rem;">
+                    <img :src="'/static/imagenes/'+ articulo.nombre +'.jpg'" class="card-img-top" :alt="articulo.nombre+'.jpg'" style="height: 200px; object-fit: cover;">
+                    <div class="card-body" style="width: 286px; height: 230px;">
+                        <h5 class="card-title">[[ articulo.nombre ]]</h5>
+                        <p class="card-text">[[articulo.descripcion]]</p>
+                        <p class="card-text"> Precio: Q[[articulo.precio]]</p>
+                        <div class="mt-auto">
+                        <button @click='CargarArticulo(articulo)' type="button" class="btn btn-primary fixed-button" data-bs-toggle="modal" data-bs-target="#modalAñadirArticulo">Añadir al Carrito</button>
                     </div>
                 </div>
             </div>
-            <div class="Modals">
-                <!-- Modal Boton Añadir al Carrito -->
-                <div class="modal fade" id="modalAñadirArticulo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Añadir al Carrito</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <label> Nombre: [[articulo.nombre]]</label><br/>
-                                <label> Precio:  Q[[articulo.precio]]</label>
-                                <div class="input-group input-group-sm mb-3">
-                                    <span class="input-group-text" id="inputGroup-sizing-sm">Cantidad</span>
-                                    <input min='1' type="number" class="form-control" v-model='articulo.cantidad' aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
-                                </div><br/>
-                                <label> Total: Q[[articulo.precio * articulo.cantidad]]</label>
-                                <div class="modal-footer">
-                                    <button type="button" id="cerrarModalAñadirArticulo" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    <button @click="añadirAlCarrito()" type="button" class="btn btn-primary">Añadir</button>
-                                </div>
-                            </div>
-                        </div>    
-                    </div>
-                </div>
-                <!-- Modal editar carrito -->
-                <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h1 class="modal-title fs-5" id="exampleModalLabel">Carrito</h1>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row mb-3">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text" id="basic-addon1">Mesa:</span>
-                                        <input type="number" v-model="carrito.mesa" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <button @click="crearNuevoCarrito()" class="btn btn-primary">Crear Nuevo Carrito</button>
-                                </div>
-                                <div class="row mb-3">
-                                    <select class="form-select" @change="obtenerItemsCarrito()" v-model="carrito.id" aria-label="Default select example">
-                                        <option v-for="carrito in lista_carritos_nuevos" :value="carrito.id">[[carrito.mesa]]</option>
-                                    </select>
-                                </div>
-                                <div class="row mb-3" v-for="item in lista_articulos_carrito">
-                                    <div class="card">
-                                        <h4 class="card-header">[[ item.articulo.nombre ]]</h4>
-                                        <div class="card-body">
-                                            <h5 class="card-title"><strong>Precio: </strong> Q[[ item.articulo.precio ]]</h5>
-                                            <h5><strong>Cantidad: </strong> [[ item.cantidad ]]</h5>
-                                            <h5><strong>Total: </strong> Q[[ item.articulo.precio * item.cantidad ]]</h5>
-                                            <button @click="eliminarItemCarrito(item.id)" class="btn btn-danger">Eliminar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        </div>
+        
+        <div class="Modals">
+            <!-- Modal Boton Añadir al Carrito -->
+            <div class="modal fade" id="modalAñadirArticulo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Añadir al Carrito</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <label> Nombre: [[articulo.nombre]]</label><br/>
+                            <label> Precio:  Q[[articulo.precio]]</label>
+                            <div class="input-group input-group-sm mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">Cantidad</span>
+                                <input min='1' type="number" class="form-control" v-model='articulo.cantidad' aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">
+                            </div><br/>
+                            <label> Total: Q[[articulo.precio * articulo.cantidad]]</label>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                <button type="button" @click="enviarCarritoACocina()" class="btn btn-primary">Enviar a Cocina</button>
+                                <button type="button" id="cerrarModalAñadirArticulo" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button @click="añadirAlCarrito()" type="button" class="btn btn-primary">Añadir</button>
                             </div>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+            
+            <!-- Modal editar carrito -->
+            <div class="modal fade" id="modalCarrito" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Carrito</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">Mesa:</span>
+                                    <input type="number" v-model="carrito.mesa" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <button @click="crearNuevoCarrito()" class="btn btn-primary">Crear Nuevo Carrito</button>
+                            </div>
+                            <div class="row mb-3">
+                                <select class="form-select" @change="obtenerItemsCarrito(); CargarCarrito()" v-model="carrito.id" aria-label="Default select example">
+                                    <option v-for="carrito in lista_carritos_nuevos" :value="carrito.id">[[carrito.mesa]]</option>
+                                </select>
+                            </div>
+                            <div class="row mb-3" v-for="item in lista_articulos_carrito">
+                                <div class="card">
+                                    <h4 class="card-header">[[ item.articulo.nombre ]]</h4>
+                                    <div class="card-body">
+                                        <h5 class="card-title"><strong>Precio: </strong> Q[[ item.articulo.precio ]]</h5>
+                                        <h5><strong>Cantidad: </strong> [[ item.cantidad ]]</h5>
+                                        <h5><strong>Total: </strong> Q[[ item.articulo.precio * item.cantidad ]]</h5>
+                                        <button @click="eliminarItemCarrito(item.id)" class="btn btn-danger">Eliminar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <h3>Total: [[ this.carrito.total_precio ]]</h3>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" @click="enviarCarritoACocina()" class="btn btn-primary">Enviar a Cocina</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-        <script>
-            new Vue({
-                el: "#app",
-                delimiters:["[[","]]"],
-                data() {
-                    return{ 
-                        lista_articulos:[],
-                        lista_carritos_nuevos: [],
-                        lista_articulos_carrito: [],
-                        articulo: {
-                            id: '',
-                            cantidad: 1,
-                            nombre: '',
-                            descripcion: '',
-                            precio: '',
-                        },
-                        carrito: {
-                            id: '',
-                            mesa: '',
-                            pagado: false
-                        },
-                    }
-                },
-                methods:{
-                    async crearNuevoCarrito(){
-                        const formData = new FormData()
-                        formData.append("mesa", this.carrito.mesa)
-                        await fetch("../API/carritos/", {
-                            method: "POST",
-                            headers: {
-                                "X-CSRFToken": Cookies.get("csrftoken")
-                            }, body: formData
-                        })
-                        this.obtenerCarritosNuevos()
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script>
+        new Vue({
+            el: "#app",
+            delimiters:["[[","]]"],
+            data() {
+                return{
+                    lista_articulos:[],
+                    lista_carritos_nuevos: [],
+                    lista_articulos_carrito: [],
+                    articulo: {
+                        id: '',
+                        cantidad: 1,
+                        nombre: '',
+                        descripcion: '',
+                        precio: '',
                     },
-                    async ObtenerArticulos(tipo){
-                        const response = await fetch("../API/articulos/?tipo=" + tipo);
-                        this.lista_articulos = await response.json();
+                    carrito: {
+                        id: '',
+                        mesa: '',
+                        total: 0
                     },
-                    async obtenerCarritosNuevos(){
-                        const response = await fetch("../API/carritos/?estado=sinAceptar");
-                        this.lista_carritos_nuevos = await response.json();
-                    },
-                    async obtenerItemsCarrito(){
-                        const response = await fetch("../API/items_carrito/?carrito=" + this.carrito.id);
-                        this.lista_articulos_carrito = await response.json();
-                    },
-                    async buscarArticulos() {
-                        const response = await fetch(`../API/articulos/?search=${this.terminoBusqueda}`);
-                        this.lista_articulos = await response.json();
-                    },
-                    async CargarArticulo(objeto){
-                        this.articulo= {
-                            id: objeto.id,
-                            nombre: objeto.nombre,
-                            descripcion: objeto.descripcion,
-                            precio: objeto.precio,
-                            cantidad: 1,
-                        }                    
-                    },
-                    async añadirAlCarrito(){
-                        const formData = new FormData()
-                        formData.append("cantidad", parseInt(this.articulo.cantidad, 10))
-                        formData.append("carrito", this.carrito.id)
-                        formData.append("idArticulo", this.articulo.id)
-
-                        await fetch("../API/items_carrito/?carrito=" + this.carrito.id, {
-                            method: "POST",
-                            headers: {
-                                "X-CSRFToken": Cookies.get("csrftoken")
-                            }, body: formData
-                        })
-
-                        document.getElementById("cerrarModalAñadirArticulo").click()
-                        this.obtenerItemsCarrito()
-                    },
-                    async enviarCarritoACocina(){
-                        const formData = new FormData()
-                        formData.append("estadopedido", "En espera")
-
-                        await fetch("../API/carrito-cambiar-estado/" + this.carrito.id + "/", {
-                            method: "PUT",
-                            headers: {
-                                "X-CSRFToken": Cookies.get("csrftoken")
-                            }, body: formData
-                        })
-
-                    this.obtenerCarritosNuevos()
-                    this.lista_articulos_carrito = []
-                    },
-                    async eliminarItemCarrito(idItemCarrito){
-                        await fetch("../API/items_carrito/" + idItemCarrito + "/?carrito=" + this.carrito.id, {
-                            method: "DELETE",
-                            headers: {
-                                "X-CSRFToken": Cookies.get("csrftoken")
-                            }
-                        })
-
-                        this.obtenerItemsCarrito()
-                    },
-                },
-                created(){
-                    this.ObtenerArticulos('');
-                    this.obtenerCarritosNuevos();
+                    terminoBusqueda: '',  // Nuevo campo para el término de búsqueda
                 }
-            })
-        </script>
-	</body>
-</html> 
+            },
+            methods:{
+                async crearNuevoCarrito(){
+                    const formData = new FormData()
+                    formData.append("mesa", this.carrito.mesa)
+                    await fetch("../API/carritos/", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": Cookies.get("csrftoken")
+                        }, body: formData
+                    })
+                    this.obtenerCarritosNuevos()
+                },
+                async ObtenerArticulos(tipo){
+                    const response = await fetch("../API/articulos/?tipo=" + tipo);
+                    this.lista_articulos = await response.json();
+                },
+                async obtenerCarritosNuevos(){
+                    const response = await fetch("../API/carritos/?estado=sinAceptar");
+                    this.lista_carritos_nuevos = await response.json();
+                },
+                async obtenerItemsCarrito(){
+                    const response = await fetch("../API/items_carrito/?carrito=" + this.carrito.id);
+                    this.lista_articulos_carrito = await response.json();
+                },
+                async buscarArticulos() {
+                    const response = await fetch(`../API/articulos/?search=${this.terminoBusqueda}`);
+                    this.lista_articulos = await response.json();
+                },
+                async CargarArticulo(objeto){
+                    this.articulo= {
+                        id: objeto.id,
+                        nombre: objeto.nombre,
+                        descripcion: objeto.descripcion,
+                        precio: objeto.precio,
+                        cantidad: 1,
+                    }                    
+                },
+                async CargarCarrito(){
+                    const response = await fetch("../API/carritos/" + this.carrito.id)
+                    this.carrito = await response.json();
+                },
+                async añadirAlCarrito(){
+                    const formData = new FormData()
+                    formData.append("cantidad", parseInt(this.articulo.cantidad, 10))
+                    formData.append("carrito", this.carrito.id)
+                    formData.append("idArticulo", this.articulo.id)
+
+                    await fetch("../API/items_carrito/?carrito=" + this.carrito.id, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": Cookies.get("csrftoken")
+                        }, body: formData
+                    })
+
+                    document.getElementById("cerrarModalAñadirArticulo").click()
+                    this.obtenerItemsCarrito()
+                    this.CargarCarrito()
+                },
+                async enviarCarritoACocina(){
+                    const formData = new FormData()
+                    formData.append("estadopedido", "En espera")
+
+                    await fetch("../API/carrito-cambiar-estado/" + this.carrito.id + "/", {
+                        method: "PUT",
+                        headers: {
+                            "X-CSRFToken": Cookies.get("csrftoken")
+                        }, body: formData
+                    })
+
+                this.obtenerCarritosNuevos()
+                this.lista_articulos_carrito = []
+                },
+                async eliminarItemCarrito(idItemCarrito){
+                    await fetch("../API/items_carrito/" + idItemCarrito + "/?carrito=" + this.carrito.id, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRFToken": Cookies.get("csrftoken")
+                        }
+                    })
+
+                    this.obtenerItemsCarrito()
+                    this.CargarCarrito()
+                },
+            },
+            created(){
+                this.ObtenerArticulos('');
+                this.obtenerCarritosNuevos();
+            }
+        })
+    </script>
+</body>
+</html>
